@@ -1,0 +1,31 @@
+import express, { type ErrorRequestHandler } from 'express';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import { pinoHttp } from 'pino-http';
+import swaggerUi from 'swagger-ui-express';
+import { ZodError } from 'zod';
+import { env } from './config/env.js';
+import { authRouter, requireAuth } from './modules/auth/auth.js';
+import { vehicleRouter } from './modules/vehicles/vehicles.js';
+import { HttpError } from './utils/errors.js';
+import { openapi } from './openapi.js';
+
+export const app = express();
+app.disable('x-powered-by');
+app.use(pinoHttp({redact:['req.headers.authorization','req.headers.cookie']}));
+app.use(cors({origin:env.FRONTEND_URL.split(',').map(v=>v.trim())}));
+app.use(express.json({limit:'64kb'}));
+app.get('/api/health',(_req,res)=>res.json({status:'ok'}));
+app.use('/api/docs',swaggerUi.serve,swaggerUi.setup(openapi));
+app.get('/api/openapi.json',(_req,res)=>res.json(openapi));
+app.use('/api/auth',rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-8',legacyHeaders:false}),authRouter);
+app.use('/api/vehicles',requireAuth,vehicleRouter);
+app.use((_req,_res,next)=>next(new HttpError(404,'Route not found')));
+const handleError:ErrorRequestHandler = (error,_req,res,_next) => {
+  void _next;
+  if (error instanceof ZodError) return void res.status(400).json({error:{message:'Validation failed',issues:error.issues}});
+  const status=error instanceof HttpError?error.status:500;
+  if(status===500) console.error(error);
+  res.status(status).json({error:{message:status===500?'Internal server error':error.message}});
+};
+app.use(handleError);

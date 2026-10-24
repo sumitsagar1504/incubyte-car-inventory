@@ -1,0 +1,23 @@
+{
+  "name": "incubyte-car-inventory",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w @inventory/api",
+    "dev:web": "npm run dev -w @inventory/web",
+    "build": "npm run build -w @inventory/api && npm run build -w @inventory/web",
+    "test": "npm run test -w @inventory/api && npm run test -w @inventory/web",
+    "lint": "npm run lint -w @inventory/api && npm run lint -w @inventory/web",
+    "typecheck": "npm run typecheck -w @inventory/api && npm run typecheck -w @inventory/web",
+    "test:e2e": "playwright test",
+    "db:migrate": "npm run db:migrate -w @inventory/api",
+    "db:seed": "npm run db:seed -w @inventory/api"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "prettier": "^3.6.2",
+    "typescript-eslint": "^8.72.0"
+  }
+}

@@ -1,0 +1,1 @@
+{"buildCommand":"npm run build -w @inventory/web","outputDirectory":"apps/web/dist","rewrites":[{"source":"/(.*)","destination":"/index.html"}]}
