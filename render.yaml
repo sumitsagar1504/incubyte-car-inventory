@@ -3,7 +3,7 @@ services:
     name: incubyte-inventory-api
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build -w @inventory/api
+    buildCommand: npm ci --include=dev && npm run build -w @inventory/api
     startCommand: npm run db:deploy -w @inventory/api && npm run start -w @inventory/api
     healthCheckPath: /api/health
     envVars:

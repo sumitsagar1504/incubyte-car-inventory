@@ -8,3 +8,7 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .DS_Store
+
+.vercel/
+.tools/
+.env.local
