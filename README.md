@@ -81,15 +81,18 @@ The browser suite expects the local PostgreSQL database to be running and migrat
 
 ## Deployment
 
-Deployment configuration is prepared, but no Vercel, Render or Neon service has been created or verified from this workspace. There are no production URLs yet.
+The application was deployed and checked on 24 October 2026:
 
-1. Push this repository to a public GitHub repository after reviewing the commit history and the AI log evidence.
-2. Create a Neon PostgreSQL database. Copy its connection string into Render as `DATABASE_URL`; do not commit it. Use a separate database for tests.
-3. Create a Render Blueprint from `render.yaml`. Set `DATABASE_URL` and `FRONTEND_URL` (the eventual Vercel origin). Render generates `JWT_SECRET`; verify it is at least 32 characters. The start command applies migrations before serving. Check `/api/health` and `/api/docs`.
-4. Import the same repository into Vercel with **repository root** as the root directory. The root `vercel.json` builds `apps/web` and publishes `apps/web/dist`. Set `VITE_API_BASE_URL` to the Render origin, without a trailing slash. Deploy, then update Render `FRONTEND_URL` to the actual Vercel origin and redeploy Render.
-5. Verify direct navigation to `/login`, registration, login, search, purchase and admin operations. Create an admin via one controlled seed run with `ADMIN_EMAIL`, `ADMIN_PASSWORD` and `ALLOW_PRODUCTION_SEED=true`, then remove those temporary settings. Verify persistence after a restart. Add verified URLs and screenshots here.
+| Component | URL |
+| --- | --- |
+| Web app (Vercel) | [incubyte-car-inventory.vercel.app](https://incubyte-car-inventory.vercel.app) |
+| API (Render) | [incubyte-inventory-api.onrender.com](https://incubyte-inventory-api.onrender.com/api/health) |
+| API docs | [Swagger UI](https://incubyte-inventory-api.onrender.com/api/docs/) |
+| Source | [GitHub repository](https://github.com/sumitsagar1504/incubyte-car-inventory) |
 
-Render free instances may sleep or have limits. Service plan selection and external account setup require the owner's decision. Database migrations can also be applied manually with `npm run db:deploy -w @inventory/api` from a configured environment. Keep credentials in host secret settings.
+The production database is a Neon PostgreSQL 16 project in Singapore. Migration `20261024000000_initial` was applied, and six demonstration vehicles plus the initial admin were seeded. The Render service uses the free plan, builds from `main`, installs development dependencies needed by TypeScript with `npm ci --include=dev`, and applies migrations during startup. Vercel builds the web app from the repository root with `VITE_API_BASE_URL` set to the Render origin. Render has `FRONTEND_URL` set to the Vercel origin for CORS. Production credentials are stored in host settings and ignored local environment files, never in Git.
+
+The first Render build failed because `NODE_ENV=production` caused npm to omit TypeScript type packages. The corrected build command deployed successfully. Live registration, login, inventory, purchase, restock and admin authorization checks passed; temporary smoke data was removed. Chromium also verified the live inventory and admin pages. See [test-report.md](test-report.md) for evidence and limits. Render free instances may sleep after inactivity, so the first API request can take longer.
 
 ## Security and limitations
 
@@ -99,7 +102,7 @@ Troubleshooting: if the API fails at startup, confirm `apps/api/.env`, database 
 
 ## Screenshots
 
-The actual browser-rendered login page is captured at [screenshots/login.png](screenshots/login.png). Inventory and admin screenshots still require a running PostgreSQL service with seeded data; do not substitute mockups.
+Browser captures: [login](screenshots/login.png) from the local smoke run, and [inventory](screenshots/inventory.png) and [admin](screenshots/admin.png) from the deployed site with the real Neon database.
 
 ## My AI Usage
 

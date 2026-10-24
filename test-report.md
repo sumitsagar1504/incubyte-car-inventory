@@ -2,7 +2,7 @@
 
 ## Environment
 
-Windows, Node.js/npm, TypeScript, Vitest, Playwright Chromium. Workspace: `D:\Inventory _system`. Docker, `psql`, and a running local PostgreSQL service were not detected. The API tests use a mocked Prisma database boundary and do not prove database connectivity or migration correctness. No production services or URLs were available.
+Windows, Node.js/npm, TypeScript, Vitest, Playwright Chromium. Workspace: `D:\Inventory _system`. Docker, `psql`, and a running local PostgreSQL service were not detected. The unit and HTTP tests use a mocked Prisma database boundary. A Neon PostgreSQL 16 production database and live deployed services were subsequently used for manual smoke verification.
 
 ## Commands and observed results
 
@@ -27,13 +27,19 @@ The 83.56% overall backend statement result includes application files, the unex
 
 `npm audit --omit=dev --json --cache .npm-cache` reported three high findings through the Prisma CLI / `@prisma/config` / `deepmerge-ts` dependency chain, with a suggested Prisma 7.10.1 major upgrade. No critical finding appeared in that production audit output. The broader install summary reported 10 findings (5 moderate, 3 high, 2 critical). Dependency upgrades and retesting remain necessary before a production launch. No automatic breaking major upgrade was applied.
 
+## Production deployment and live checks
+
+On 24 October 2026, the repository was pushed to GitHub. Neon migration `20261024000000_initial` applied successfully and the seed created six vehicles plus one admin. The Vercel production URL returned HTTP 200 for `/` and `/login`; its JavaScript bundle contained the Render API origin. The Render API returned HTTP 200 for `/api/health`, `/api/docs/`, and `/api/openapi.json`.
+
+A live API smoke run against Neon verified registration with the `USER` role, user and admin login, authenticated inventory listing (six seed vehicles), make search, temporary vehicle creation, purchase reducing quantity from two to one, admin restock to two, rejection of user restock with HTTP 403, and admin deletion of the temporary vehicle. Two temporary registration accounts were deleted from the database after the runs. A Chromium run then signed in as admin through the public Vercel URL, observed six inventory cards and six admin rows, and captured `screenshots/inventory.png` and `screenshots/admin.png`.
+
+The first Render build and an automatic retry failed because `NODE_ENV=production` omitted TypeScript type packages during `npm ci`. Updating the build command to `npm ci --include=dev && npm run build -w @inventory/api` resolved it; deployment `dep-dbe6kk4s728c73b60mk0` succeeded.
+
 ## Not executed or verified
 
-- PostgreSQL migration, seed, persistence and integration tests: no local PostgreSQL or Docker available.
-- Concurrent purchase behavior against a real PostgreSQL database: conditional update logic is tested with mocks only.
-- End-to-end registration, purchase and admin management flows: require a real database and initial admin.
-- Production deployment and live endpoint verification: Vercel, Render, Neon and GitHub accounts are not connected in this workspace.
-- Inventory and admin screenshots with actual database data.
+- A concurrent purchase race against real PostgreSQL; the conditional update is covered by mocked tests and one live purchase.
+- Persistence after a Render service restart.
+- A full user browser purchase flow; purchase and authorization were verified at the live API, while inventory and admin rendering were verified in Chromium.
 
 ## Remaining issues
 
