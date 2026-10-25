@@ -43,4 +43,6 @@ The first Render build and an automatic retry failed because `NODE_ENV=productio
 
 ## Remaining issues
 
-The initial red test run and an incremental red-green-refactor commit trail were not captured. `PROMPTS.md` contains the available raw master prompt; complete AI responses and other chat logs need the owner's export. External vehicle images may fail in restricted browsers; the login and hero artwork is local and renders correctly.
+On 25 October 2026, the six seed-vehicle cards were changed from make-only external URLs to bundled photos matched by exact make and model. Each image was checked visually against its Wikimedia Commons file page, and attribution was added at `/photo-credits.html`. The web build passed. The live Vercel deployment returned HTTP 200 for all six image assets and the credits page, and Chromium confirmed that every card loaded the matching local path and photo.
+
+The initial red test run and an incremental red-green-refactor commit trail were not captured. `PROMPTS.md` contains the available raw master prompt; complete AI responses and other chat logs need the owner's export.
