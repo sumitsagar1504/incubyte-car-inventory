@@ -7,6 +7,7 @@ import { ZodError } from 'zod';
 import { env } from './config/env.js';
 import { authRouter, requireAuth } from './modules/auth/auth.js';
 import { vehicleRouter } from './modules/vehicles/vehicles.js';
+import { reservationRouter } from './modules/reservations/reservations.js';
 import { HttpError } from './utils/errors.js';
 import { openapi } from './openapi.js';
 
@@ -19,7 +20,8 @@ app.get('/api/health',(_req,res)=>res.json({status:'ok'}));
 app.use('/api/docs',swaggerUi.serve,swaggerUi.setup(openapi));
 app.get('/api/openapi.json',(_req,res)=>res.json(openapi));
 app.use('/api/auth',rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-8',legacyHeaders:false}),authRouter);
-app.use('/api/vehicles',requireAuth,vehicleRouter);
+app.use('/api/vehicles',vehicleRouter);
+app.use('/api/reservations',requireAuth,reservationRouter);
 app.use((_req,_res,next)=>next(new HttpError(404,'Route not found')));
 const handleError:ErrorRequestHandler = (error,_req,res,_next) => {
   void _next;

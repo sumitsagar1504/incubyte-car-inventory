@@ -7,7 +7,10 @@ const schema = z.object({
   JWT_EXPIRES_IN: z.string().default('8h'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   PORT: z.coerce.number().int().positive().default(4000),
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development')
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.email().optional()
 });
 
 export const env = schema.parse(process.env);
+export const emailEnabled = Boolean(env.RESEND_API_KEY && env.EMAIL_FROM);
